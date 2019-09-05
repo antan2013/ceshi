@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>尚马CRM系统</title>
+    <!-- Bootstrap Core CSS -->
+    <link href="./css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="./css/sb-admin-2.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="./css/font-awesome.min.css" rel="stylesheet" type="text/css">
+   
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <style>
+        #pagination {
+            float: right;
+            margin-right: 30px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="wrapper">
+
+    <!-- 标题栏-->
+    <nav class="navbar navbar-default navbar-static-top" role="navigation"
+         style="margin-bottom: 0">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="customer.html">尚马客户管理</a>
+        </div>
+
+        <!--导航部分-->
+        <div class="navbar-default sidebar" role="navigation">
+            <div class="sidebar-nav navbar-collapse">
+                <ul class="nav" id="side-menu">
+                    <li><a href="" class="active"><i class="fa fa-edit fa-fw"></i>客户管理</a></li>
+
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!--页面右侧部分-->
+    <div id="page-wrapper">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">客户管理</h1>
+            </div>
+        </div>
+
+        <!-- 查询表单-->
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <form class="form-inline" id="searchForm">
+                    <div class="form-group">
+                        <label for="customerName">客户名称</label>
+                        <input type="text" class="form-control" id="customerName" name="customer.name">
+                    </div>
+                    <div class="form-group">
+                        <label for="customerFrom">客户来源</label>
+                        <select class="form-control" id="customerFrom" name="customer.sid" placeholder="客户来源">
+                            <option value="">--请选择--</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="custIndustry">所属行业</label>
+                        <select class="form-control" id="custIndustry" name="customer.indusid">
+                            <option value="">--请选择--</option>
+
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="custLevel">客户级别</label>
+                        <select class="form-control" id="custLevel"  name="customer.leid">
+                            <option value="">--请选择--</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" id="searchBtn" onclick="initPage();">查询</button>
+                </form>
+            </div>
+        </div>
+        <!--列表展示-->
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">客户信息列表</div>
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>客户名称</th>
+                            <th>客户来源</th>
+                            <th>客户所属行业</th>
+                            <th>客户级别</th>
+                            <th>固定电话</th>
+                            <th>手机</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody id="tbody">
+
+
+                        </tbody>
+                    </table>
+
+                </div>
+
+            </div>
+
+
+           
+        </div>
+
+        <div class="row col-lg-9 col-lg-offset-5" id="page">
+            <a class="btn btn-default" href="javascript:firstPage();" role="button" id="firstPage">首页</a>
+            <a class="btn btn-default" href="javascript:prePage();" role="button" id="prePage">上一页</a>
+            <a class="btn btn-default" href="javascript:nextPage();" role="button" id="nextPage">下一页</a>
+            <a class="btn btn-default" href="javascript:lastPage();" role="button" id="lastPage">尾页</a>
+            &nbsp;<span  style="font-size: 16px">到第</span>
+            <input type="text" id="currentPage" name="currentPage" value="1" style="width: 54px;height:34px;text-align: center; border-radius:4px;border: 1px solid #dddddd;">
+            <a class="btn btn-default" href="javascript:jumpPage();" role="button" >确定</a>
+            &nbsp;&nbsp;<span id="totalPage" style="font-size: 16px"></span>&nbsp;&nbsp;
+            <select id="rows" name ="rows" style="width: 50px;height:32px;text-align: center; border-radius:4px;border: 1px solid #dddddd;">
+                <option value="10" >10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+            </select>
+            <span id="totalCount" style="font-size: 16px"></span>
+        </div>
+    </div>
+
+
+</div>
+
+
+<!-- 删除对话框提示 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4>温馨提示</h4>
+            </div>
+            <div class="modal-body">
+                <strong>你确定删除这条记录吗?</strong>
+                <input type="hidden" name = "id" id="hideDeleId">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-danger"  data-dismiss="modal" onclick="deleteCustomer()">确定</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- 客户编辑对话框 -->
+<div class="modal fade" id="customerEditDialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel">修改客户信息</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" id="edit_customer_form">
+                    <input type="hidden" name="id" id="hiddenid" />
+                    <div class="form-group">
+                        <label for="edit_customerName" class="col-sm-2 control-label">客户名称</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="edit_customerName" name = "name"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_customerFrom" style="float:left;padding:7px 15px 0 27px;">客户来源</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" id="edit_customerFrom" name="sid">
+                            <option value="">--请选择--</option>
+
+
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_custIndustry" style="float:left;padding:7px 15px 0 27px;">所属行业</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" id="edit_custIndustry" name ="indusid" >
+                                <option value="">--请选择--</option>
+
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_custLevel" style="float:left;padding:7px 15px 0 27px;">客户级别</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" id="edit_custLevel" name="leid">
+                                <option value="">--请选择--</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit_phone" class="col-sm-2 control-label">固定电话</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="edit_phone" placeholder="固定电话" name="phone" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_mobile" class="col-sm-2 control-label">移动电话</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="edit_mobile" placeholder="移动电话" name="mobile"/>
+                        </div>
+                    </div>
+
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" onclick="saveCustomer();">保存修改</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--页面结束-->
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<script>
+    $(function () {
+        initPage();
+        $("#rows").change(function () {
+            initPage();
+            firstPage();
+        });
+    });
+
+    function initPage() {
+        var currentPage = $("#currentPage").val();
+        var pageSize = $("#rows").val();
+        console.log(pageSize);
+        console.log(currentPage);
+        var param = $("#searchForm").serialize();
+        var url = "/customer/findAll?currentPage="+currentPage+"&pageSize="+pageSize+"&"+param;
+        $.getJSON(url,function (data) {
+            option(data);
+            viewTable(data);
+            viewPage(data);
+        });
+    }
+    
+
+    function viewTable(data) {
+        var html = '';
+        $("#tbody").html(html);
+        $.each(data.pageBean.list,function (i,d) {
+            html += '<tr>';
+            html += '<td>'+d.id+'</td>';
+            html += '<td>'+d.name+'</td>';
+            html += '<td>'+d.source+'</td>';
+            html += '<td>'+d.industry+'</td>';
+            html += '<td>'+d.level+'</td>';
+            html += '<td>'+d.phone+'</td>';
+            html += '<td>'+d.mobile+'</td>';
+            html += '<td><button  class="btn btn-info btn-sm glyphicon glyphicon-edit" data-toggle="modal" data-target="#customerEditDialog" onclick="viewEditForm('+d.id+')"> 修改</button>&nbsp;' +
+                '<button class="btn btn-warning btn-sm glyphicon glyphicon-trash" data-toggle="modal" data-target="#myModal" onclick="delViewId('+d.id+')" > 删除</button>';
+            html += '</tr>';
+        });
+        $("#tbody").html(html);
+    }
+    function option(data) {
+        $("#customerFrom").html(' <option value="">--请选择--</option>');
+        $("#edit_customerFrom").html(' <option value="">--请选择--</option>');
+        $.each(data.sources,function (i,d) {
+
+            $("#customerFrom").append("<option value="+d.id+">"+d.name+"</option>");
+            $("#edit_customerFrom").append("<option value="+d.id+">"+d.name+"</option>");
+        });
+        $("#custIndustry").html(' <option value="">--请选择--</option>');
+        $("#edit_custIndustry").html(' <option value="">--请选择--</option>');
+        $.each(data.industries,function (i,d) {
+
+            $("#custIndustry").append('<option value='+d.id+'>'+d.name+'</option>');
+            $("#edit_custIndustry").append('<option value='+d.id+'>'+d.name+'</option>');
+        });
+        $("#custLevel").html(' <option value="">--请选择--</option>');
+        $("#edit_custLevel").html(' <option value="">--请选择--</option>');
+        $.each(data.levels,function (i,d) {
+
+            $("#custLevel").append('<option value='+d.id+'>'+d.name+'</option>');
+            $("#edit_custLevel").append('<option value='+d.id+'>'+d.name+'</option>');
+        });
+    }
+    function viewEditForm(id) {
+        var url = "/customer/findById?id="+id;
+        $.getJSON(url,function (data) {
+            $("#hiddenid").val(data.id);
+            $("#edit_customerName").val(data.name);
+            $("#edit_customerFrom").val(data.sid);
+            $("#edit_custIndustry").val(data.indusid);
+            $("#edit_custLevel").val(data.leid);
+            $("#edit_phone").val(data.phone);
+            $("#edit_mobile").val(data.mobile);
+        });
+    }
+    function saveCustomer() {
+        var param = $("#edit_customer_form").serialize();
+        var url = "/customer/saveCustomer?"+param;
+        $.ajax(url);
+        $("#customerEditDialog").modal("hide");
+        initPage();
+    }
+    function delViewId(id) {
+        $("#hideDeleId").val(id);
+    }
+    function deleteCustomer() {
+        var id = $("#hideDeleId").val();
+        console.log(id);
+        var url = "/customer/deleteCustomer?id="+id;
+        $.ajax(url);
+        initPage();
+    }
+
+
+    //分页数据存储
+    function  viewPage(data) {
+        $("#fortotalPage").val(data.pageBean.totalPage);
+        $("#currentPage").val(data.pageBean.currentPage);
+        $("#rows").val(data.pageBean.rows);
+        $("#totalPage").html('共'+data.pageBean.totalPage+'页，每页显示');
+        $("#totalCount").html('条，共'+data.pageBean.totalCount+'条记录');
+    }
+    //跳转指定页面
+    function jump(currentPage) {
+        $("#currentPage").val(currentPage);
+        initPage();
+    }
+    //跳转页面
+    function jumpPage(){
+        jump( $("#currentPage").val())
+    }
+    //首页
+    function firstPage() {
+        jump(1);
+    }
+    //尾页
+    function lastPage() {
+        jump($("#fortotalPage").val());
+    }
+    //上一页
+    function prePage() {
+        var currentPage = parseInt($("#currentPage").val());
+        if (currentPage>1){
+            jump(currentPage-1);
+            $("#currentPage").val(currentPage-1);
+        }
+    }
+    //下一页
+    function nextPage() {
+        var currentPage = parseInt($("#currentPage").val());
+        var fortotalPage =  parseInt($("#fortotalPage").val());
+        if (currentPage<fortotalPage){
+            jump(currentPage+1);
+            $("#currentPage").val(currentPage+1);
+        }
+
+    }
+</script>
+
+
+
+</body>
+</html>
